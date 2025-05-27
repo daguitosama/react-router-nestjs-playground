@@ -1,0 +1,31 @@
+name: 'Validate Semver Tag'
+description: 'Validates if the tag follows semantic versioning format'
+
+outputs:
+  is-valid:
+    description: 'Whether the tag is a valid semver tag'
+    value: ${{ steps.validate.outputs.is_valid }}
+  version:
+    description: 'The version number without the v prefix'
+    value: ${{ steps.validate.outputs.version }}
+  tag:
+    description: 'The original tag'
+    value: ${{ steps.validate.outputs.tag }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check if tag matches semver pattern
+      id: validate
+      shell: bash
+      run: |
+        if [[ "${{ github.ref }}" =~ ^refs/tags/v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+          echo "is_valid=true" >> $GITHUB_OUTPUT
+          echo "version=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "✅ Valid semver tag: v${BASH_REMATCH[1]}"
+        else
+          echo "is_valid=false" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "❌ Invalid semver tag: ${GITHUB_REF#refs/tags/}"
+        fi

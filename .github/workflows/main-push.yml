@@ -1,0 +1,24 @@
+name: Main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+# Add concurrency to ensure only one workflow runs at a time
+concurrency:
+  group: main-push-${{ github.ref }}
+  cancel-in-progress: true
+
+# Minimal permissions for test-only workflow
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Tests
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      package-filter: "@cbnsndwch/react-router-nest-server"
+      test-command: "test:cov"
+      build-command: "build:app"

@@ -1,0 +1,54 @@
+name: 'Test Report'
+description: 'Runs tests and generates a coverage report'
+
+inputs:
+  package-filter:
+    description: 'Package to run tests for'
+    required: true
+  test-command:
+    description: 'Command to run tests'
+    required: true
+    default: 'test:cov'
+  build-command:
+    description: 'Command to build the app'
+    required: false
+    default: 'build'
+  test-results-path:
+    description: 'Path to test results'
+    required: false
+    default: 'test-results'
+  coverage-path:
+    description: 'Path to coverage results'
+    required: false
+    default: 'coverage'
+  artifact-retention-days:
+    description: 'Number of days to retain artifacts'
+    required: false
+    default: '7'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build application
+      shell: bash
+      run: pnpm ${{ inputs.build-command }}
+
+    - name: Run tests
+      shell: bash
+      run: pnpm --filter "${{ inputs.package-filter }}" ${{ inputs.test-command }}
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: ${{ inputs.test-results-path }}
+        retention-days: ${{ inputs.artifact-retention-days }}
+        if-no-files-found: warn
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: ${{ inputs.coverage-path }}
+        retention-days: ${{ inputs.artifact-retention-days }}
+        if-no-files-found: warn
