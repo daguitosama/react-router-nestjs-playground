@@ -16,4 +16,4 @@
 
 ### Polotno Playground
 
-See `apps/server/routes/studio/{route,Studio}.tsx` for the initialization of Polotno. After running dev mode you would see
+See `apps/server/routes/studio/{route,Studio}.tsx` for the initialization of Polotno. After running dev mode you would see an error screen on `http://localhost:4003/studio`: `Error: Cannot find module '../build/Release/canvas.node'`
